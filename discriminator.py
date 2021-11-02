@@ -9,7 +9,8 @@ from keras.layers import Activation
 from keras.layers import Concatenate
 from keras.layers import BatchNormalization
 import tensorflow_addons as tfa
-from InstanceNormalization_code import InstanceNormalization
+#from InstanceNormalization_code import InstanceNormalization
+from keras_contrib.layers.normalization.instancenormalization import InstanceNormalization
 from keras.utils.vis_utils import plot_model
 
 
