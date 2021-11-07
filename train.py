@@ -1,3 +1,4 @@
+from matplotlib import pyplot
 from numpy import randint, ones, zeros, random, asarray 
 from discriminator import define_discriminator
 from generator import define_generator
@@ -39,6 +40,39 @@ def update_image_pool(pool, images, max_size=50):
 			pool[ix] = image
 	return asarray(selected)
 
+# generate samples and save as a plot and save the model
+def summarize_performance(step, g_model, trainX, name, n_samples=5):
+	# select a sample of input images
+	X_in, _ = generate_real_samples(trainX, n_samples, 0)
+	# generate translated images
+	X_out, _ = generate_fake_samples(g_model, X_in, 0)
+	# scale all pixels from [-1,1] to [0,1]
+	X_in = (X_in + 1) / 2.0
+	X_out = (X_out + 1) / 2.0
+	# plot real images
+	for i in range(n_samples):
+		pyplot.subplot(2, n_samples, 1 + i)
+		pyplot.axis('off')
+		pyplot.imshow(X_in[i])
+	# plot translated image
+	for i in range(n_samples):
+		pyplot.subplot(2, n_samples, 1 + n_samples + i)
+		pyplot.axis('off')
+		pyplot.imshow(X_out[i])
+	# save plot to file
+	filename1 = '%s_generated_plot_%06d.png' % (name, (step+1))
+	pyplot.savefig(filename1)
+	pyplot.close()
+
+    # save the generator models to file
+def save_models(step, g_model_AtoB, g_model_BtoA):
+	# save the first generator model
+	filename1 = 'g_model_AtoB_%06d.h5' % (step+1)
+	g_model_AtoB.save(filename1)
+	# save the second generator model
+	filename2 = 'g_model_BtoA_%06d.h5' % (step+1)
+	g_model_BtoA.save(filename2)
+	print('>Saved: %s and %s' % (filename1, filename2))
 
 # train cyclegan models
 def train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoB, c_model_BtoA, dataset):
@@ -77,6 +111,15 @@ def train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoB, c_mode
 		dB_loss2 = d_model_B.train_on_batch(X_fakeB, y_fakeB)
 		# summarize performance
 		print('>%d, dA[%.3f,%.3f] dB[%.3f,%.3f] g[%.3f,%.3f]' % (i+1, dA_loss1,dA_loss2, dB_loss1,dB_loss2, g_loss1,g_loss2))
+        # evaluate the model performance every so often
+        if (i+1) % (bat_per_epo * 1) == 0:
+			# plot A->B translation
+			summarize_performance(i, g_model_AtoB, trainA, 'AtoB')
+			# plot B->A translation
+			summarize_performance(i, g_model_BtoA, trainB, 'BtoA')
+        if (i+1) % (bat_per_epo * 5) == 0:
+            # save the models
+            save_models(i, g_model_AtoB, g_model_BtoA)
 
 
 # input shape

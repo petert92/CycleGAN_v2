@@ -11,8 +11,10 @@ Only Generator-A weights are trainable and weights for other models and not trai
 Adversarial Loss: Domain-B -> Generator-A -> Domain-A -> Discriminator-A -> [real/fake]
 Identity Loss: Domain-A -> Generator-A -> Domain-A
 Forward Cycle Loss: Domain-B -> Generator-A -> Domain-A -> Generator-B -> Domain-B
-Backward Cycle Loss: Domain-A -> Generator-B -> Domain-B -> Generator-A -> Domain-A'''
-''' same but oposite for G-B'''
+Backward Cycle Loss: Domain-A -> Generator-B -> Domain-B -> Generator-A -> Domain-A
+Inputs: Domain-B, Domain-A
+Outputs: Real, Domain-A, Domain-B, Domain-A'''
+'''Same but oposite for G-B'''
 
 
 # define a composite model for updating generators by adversarial and cycle loss
