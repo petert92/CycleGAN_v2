@@ -145,24 +145,35 @@ c_model_BtoAtoB = define_composite_model(g_model_BtoA, d_model_A, g_model_AtoB, 
 
 
 # load a dataset as a list of two numpy arrays
+## load images and create a ndarray: col_1->anime, col_2->real
+# input: anime images path, real images path
+# output: ndarray[countImages, 2]
 def load_dataset (animePath, realPath):
-	outputList = list()
-	with os.scandir(animePath) as SrcDirectories: # inside each directory from bathpath
-		for Entry in SrcDirectories:
-			if Entry.is_file():
-				img= load_img(Entry.path, target_size=(256,256))
-				img= img_to_array(img)
-				outputList.append([img, 0])
+  aux1 = list()
+  aux2 = list()
+  with os.scandir(animePath) as SrcDirectories: # inside each directory from bathpath
+    for Entry in SrcDirectories:
+      if Entry.is_file():
+        img= load_img(Entry.path, target_size=(256,256))
+        img= img_to_array(img)
+        aux1.append([img,0])
+  with os.scandir(realPath) as SrcDirectories: # inside each directory from bathpath
+    for Entry in SrcDirectories:
+      if Entry.is_file():
+        img= load_img(Entry.path, target_size=(256,256))
+        img= img_to_array(img)
+        aux2.append([img,0])
+  aux1 = asarray(aux1)
+  aux2 = asarray(aux2)
+  print(shape(aux1), shape(aux2))
+  
+  outputList = list()
+  for i in range(len(aux1)):
+    outputList.append([aux1[i][0],aux2[i][0]])
+  outputList = asarray(outputList)
+  return outputList
 
-	# with os.scandir(realPath) as SrcDirectories: # inside each directory from bathpath
-	# 	i = 0
-	# 	for Entry in SrcDirectories:
-	# 		if Entry.is_file():
-	# 			img= load_img(Entry.path, target_size=(256,256))
-	# 			img= img_to_array(img)
-	# 			outputList[i,1] = img
-	
-	return outputList
-dataset = load_dataset('anime','real_selected')
+dataset = load_dataset('CycleGAN_v2/anime','CycleGAN_v2/real_selected')
+
 # train models
 train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoBtoA, c_model_BtoAtoB, dataset)
