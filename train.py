@@ -1,5 +1,9 @@
-from matplotlib import pyplot
-from numpy import randint, ones, zeros, random, asarray 
+import matplotlib.pyplot as plt
+from numpy import  ones, zeros, random, asarray 
+from numpy.random import randint
+import os
+from keras.preprocessing.image import img_to_array
+from keras.preprocessing.image import load_img
 from discriminator import define_discriminator
 from generator import define_generator
 from composite_model import define_composite_model
@@ -51,18 +55,18 @@ def summarize_performance(step, g_model, trainX, name, n_samples=5):
 	X_out = (X_out + 1) / 2.0
 	# plot real images
 	for i in range(n_samples):
-		pyplot.subplot(2, n_samples, 1 + i)
-		pyplot.axis('off')
-		pyplot.imshow(X_in[i])
+		plt.subplot(2, n_samples, 1 + i)
+		plt.axis('off')
+		plt.imshow(X_in[i])
 	# plot translated image
 	for i in range(n_samples):
-		pyplot.subplot(2, n_samples, 1 + n_samples + i)
-		pyplot.axis('off')
-		pyplot.imshow(X_out[i])
+		plt.subplot(2, n_samples, 1 + n_samples + i)
+		plt.axis('off')
+		plt.imshow(X_out[i])
 	# save plot to file
 	filename1 = '%s_generated_plot_%06d.png' % (name, (step+1))
-	pyplot.savefig(filename1)
-	pyplot.close()
+	plt.savefig(filename1)
+	plt.close()
 
     # save the generator models to file
 def save_models(step, g_model_AtoB, g_model_BtoA):
@@ -141,6 +145,24 @@ c_model_BtoAtoB = define_composite_model(g_model_BtoA, d_model_A, g_model_AtoB, 
 
 
 # load a dataset as a list of two numpy arrays
-dataset = ...
+def load_dataset (animePath, realPath):
+	outputList = list()
+	with os.scandir(animePath) as SrcDirectories: # inside each directory from bathpath
+		for Entry in SrcDirectories:
+			if Entry.is_file():
+				img= load_img(Entry.path, target_size=(256,256))
+				img= img_to_array(img)
+				outputList.append([img, 0])
+
+	# with os.scandir(realPath) as SrcDirectories: # inside each directory from bathpath
+	# 	i = 0
+	# 	for Entry in SrcDirectories:
+	# 		if Entry.is_file():
+	# 			img= load_img(Entry.path, target_size=(256,256))
+	# 			img= img_to_array(img)
+	# 			outputList[i,1] = img
+	
+	return outputList
+dataset = load_dataset('anime','real_selected')
 # train models
 train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoBtoA, c_model_BtoAtoB, dataset)
