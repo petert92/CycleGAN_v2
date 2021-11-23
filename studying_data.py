@@ -332,7 +332,7 @@ def load_dataset (path, size=(256,256)):
       if Entry.is_file():
         img= load_img(Entry.path, target_size=size)
         img= img_to_array(img)
-        aux.append([img,0])
+        aux.append(img)
 
   return np.asarray(aux)
 

@@ -8,6 +8,18 @@ from discriminator import define_discriminator
 from generator import define_generator
 from composite_model import define_composite_model
 
+# load and prepare training images
+def load_real_samples(filename):
+	# load the dataset
+	data = load(filename, allow_pickle=True)
+	# unpack arrays
+	X1, X2 = data['arr_0'], data['arr_1']
+	# scale from [0,255] to [-1,1]
+	X1 = (X1 - 127.5) / 127.5
+	X2 = (X2 - 127.5) / 127.5
+	return [X1, X2]
+
+
 # select a batch of random samples, returns images and target
 def generate_real_samples(dataset, n_samples, patch_shape):
 	# choose random instances
@@ -85,7 +97,7 @@ def train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoB, c_mode
 	# determine the output square shape of the discriminator
 	n_patch = d_model_A.output_shape[1]
 	# unpack dataset
-	trainA, trainB = dataset['arr_0'], dataset['arr_1']
+	trainA, trainB = dataset
 	# prepare image pool for fakes
 	poolA, poolB = list(), list()
 	# calculate the number of batches per training epoch
@@ -126,8 +138,12 @@ def train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoB, c_mode
 			save_models(i, g_model_AtoB, g_model_BtoA)
 
 
-# input shape
-image_shape = (256,256,3)
+
+# load image data
+dataset = load_real_samples('Anime2RealDogs_dataset.npz')
+print('Loaded', dataset[0].shape, dataset[1].shape)
+# define input shape based on the loaded dataset
+image_shape = dataset[0].shape[1:]
 # generator: A -> B
 g_model_AtoB = define_generator(image_shape)
 # generator: B -> A
@@ -136,14 +152,15 @@ g_model_BtoA = define_generator(image_shape)
 d_model_A = define_discriminator(image_shape)
 # discriminator: B -> [real/fake]
 d_model_B = define_discriminator(image_shape)
-
 # composite: A -> B -> [real/fake, A]
-c_model_AtoBtoA = define_composite_model(g_model_AtoB, d_model_B, g_model_BtoA, image_shape)
+c_model_AtoB = define_composite_model(g_model_AtoB, d_model_B, g_model_BtoA, image_shape)
 # composite: B -> A -> [real/fake, B]
-c_model_BtoAtoB = define_composite_model(g_model_BtoA, d_model_A, g_model_AtoB, image_shape)
+c_model_BtoA = define_composite_model(g_model_BtoA, d_model_A, g_model_AtoB, image_shape)
+# train models
+train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoB, c_model_BtoA, dataset)
 
-
-dataset = load('AnimeReal_dogs.npz')
+# input shape
+#image_shape = (256,256,3)
 
 # train models
-train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoBtoA, c_model_BtoAtoB, dataset)
+train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoB, c_model_BtoA, dataset)

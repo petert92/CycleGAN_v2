@@ -8,6 +8,7 @@ from keras.layers import LeakyReLU
 from keras.layers import Activation
 from keras.layers import Concatenate
 from keras.layers import BatchNormalization
+from keras.utils.vis_utils import plot_model
 import tensorflow_addons as tfa
 #from InstanceNormalization_code import InstanceNormalization
 from keras_contrib.layers.normalization.instancenormalization import InstanceNormalization
@@ -48,11 +49,11 @@ def define_discriminator(image_shape):
 	model.compile(loss='mse', optimizer=Adam(lr=0.0002, beta_1=0.5), loss_weights=[0.5])
 	return model
 
-# define image shape
-image_shape = (256,256,3)
-# create the model
-model = define_discriminator(image_shape)
-# summarize the model
-model.summary()
-# plot the model
-plot_model(model, to_file='discriminator_model_plot.png', show_shapes=True, show_layer_names=True)
+# # define image shape
+# image_shape = (256,256,3)
+# # create the model
+# model = define_discriminator(image_shape)
+# # summarize the model
+# model.summary()
+# # plot the model
+# plot_model(model, to_file='discriminator_model_plot.png', show_shapes=True, show_layer_names=True)

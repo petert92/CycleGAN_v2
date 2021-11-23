@@ -26,7 +26,7 @@ def resnet_block(n_filters, input_layer):
 	return g
 
 # define the standalone generator model
-def define_generator(image_shape=(256,256,3), n_resnet=9):
+def define_generator(image_shape, n_resnet=9):
 	# weight initialization
 	init = RandomNormal(stddev=0.02)
 	# image input
@@ -62,9 +62,9 @@ def define_generator(image_shape=(256,256,3), n_resnet=9):
 	model = Model(in_image, out_image)
 	return model
 
-# create the model
-model = define_generator()
-# summarize the model
-model.summary()
-# plot the model
-plot_model(model, to_file='generator_model_plot.png', show_shapes=True, show_layer_names=True)
+# # create the model
+# model = define_generator()
+# # summarize the model
+# model.summary()
+# # plot the model
+# plot_model(model, to_file='generator_model_plot.png', show_shapes=True, show_layer_names=True)

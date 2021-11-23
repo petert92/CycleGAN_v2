@@ -46,18 +46,18 @@ def define_composite_model(g_model_1, d_model, g_model_2, image_shape):
 	return model
 
 
-# input shape
-image_shape = (256,256,3)
-# generator: A -> B
-g_model_AtoB = define_generator(image_shape)
-# generator: B -> A
-g_model_BtoA = define_generator(image_shape)
-# discriminator: A -> [real/fake]
-d_model_A = define_discriminator(image_shape)
-# discriminator: B -> [real/fake]
-d_model_B = define_discriminator(image_shape)
+# # input shape
+# image_shape = (256,256,3)
+# # generator: A -> B
+# g_model_AtoB = define_generator(image_shape)
+# # generator: B -> A
+# g_model_BtoA = define_generator(image_shape)
+# # discriminator: A -> [real/fake]
+# d_model_A = define_discriminator(image_shape)
+# # discriminator: B -> [real/fake]
+# d_model_B = define_discriminator(image_shape)
 
-# composite: A -> B -> [real/fake, A]
-c_model_AtoBtoA = define_composite_model(g_model_AtoB, d_model_B, g_model_BtoA, image_shape)
-# composite: B -> A -> [real/fake, B]
-c_model_BtoAtoB = define_composite_model(g_model_BtoA, d_model_A, g_model_AtoB, image_shape)
+# # composite: A -> B -> [real/fake, A]
+# c_model_AtoBtoA = define_composite_model(g_model_AtoB, d_model_B, g_model_BtoA, image_shape)
+# # composite: B -> A -> [real/fake, B]
+# c_model_BtoAtoB = define_composite_model(g_model_BtoA, d_model_A, g_model_AtoB, image_shape)
