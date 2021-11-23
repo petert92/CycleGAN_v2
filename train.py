@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-from numpy import  ones, zeros, random, asarray, shape
+from numpy import  ones, zeros, random, asarray, load
 from numpy.random import randint
 from os import scandir
-from keras.preprocessing.image import img_to_array
-from keras.preprocessing.image import load_img
+# from keras.preprocessing.image import img_to_array
+# from keras.preprocessing.image import load_img
 from discriminator import define_discriminator
 from generator import define_generator
 from composite_model import define_composite_model
@@ -85,7 +85,7 @@ def train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoB, c_mode
 	# determine the output square shape of the discriminator
 	n_patch = d_model_A.output_shape[1]
 	# unpack dataset
-	trainA, trainB = dataset
+	trainA, trainB = dataset['arr_0'], dataset['arr_1']
 	# prepare image pool for fakes
 	poolA, poolB = list(), list()
 	# calculate the number of batches per training epoch
@@ -143,36 +143,7 @@ c_model_AtoBtoA = define_composite_model(g_model_AtoB, d_model_B, g_model_BtoA, 
 c_model_BtoAtoB = define_composite_model(g_model_BtoA, d_model_A, g_model_AtoB, image_shape)
 
 
-
-# load a dataset as a list of two numpy arrays
-## load images and create a ndarray: col_1->anime, col_2->real
-# input: anime images path, real images path
-# output: ndarray[countImages, 2]
-def load_dataset (animePath, realPath):
-  aux1 = list()
-  aux2 = list()
-  with scandir(animePath) as SrcDirectories: # inside each directory from bathpath
-    for Entry in SrcDirectories:
-      if Entry.is_file():
-        img= load_img(Entry.path, target_size=(256,256))
-        img= img_to_array(img)
-        aux1.append([img,0])
-  with scandir(realPath) as SrcDirectories: # inside each directory from bathpath
-    for Entry in SrcDirectories:
-      if Entry.is_file():
-        img= load_img(Entry.path, target_size=(256,256))
-        img= img_to_array(img)
-        aux2.append([img,0])
-  aux1 = asarray(aux1)
-  aux2 = asarray(aux2)
-  
-  for i in range(len(aux1)):
-    aux1[i][1] = aux2[i][0]
-
-  return aux1
-
-
-dataset = load_dataset('anime','real_selected')
+dataset = load('AnimeReal_dogs.npz')
 
 # train models
 train(d_model_A, d_model_B, g_model_AtoB, g_model_BtoA, c_model_AtoBtoA, c_model_BtoAtoB, dataset)
